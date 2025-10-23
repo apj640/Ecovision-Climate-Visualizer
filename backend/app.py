@@ -4,6 +4,7 @@
 
 from flask import Flask
 from flask_cors import CORS
+import click
 import os
 from database import db
 import models
@@ -27,6 +28,27 @@ app.config["SQLALCHEMY_DATABASE_URI"] = build_conn_str()
 with app.app_context():
     db.init_app(app)
     db.create_all()
+
+
+@click.option(
+    "--clear",
+    is_flag=True,
+    default=False,
+    help="Clear existing data before populating.",
+)
+@app.cli.command("seed")
+def seed_command(clear):
+    """Populate the database with initial data."""
+    from seed import populate_db
+
+    populate_db(app, clear)
+
+
+@app.cli.command("dropdb")
+def drop_db_command():
+    """Drop all tables in the database."""
+    print("Clearing existing data...")
+    db.drop_all()
 
 
 if __name__ == "__main__":
