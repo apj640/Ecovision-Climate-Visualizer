@@ -2,7 +2,7 @@ from flask import jsonify, request, Blueprint
 from datetime import date
 from models import Location, Metric, ClimateData
 from const import QUALITY_WEIGHTS
-
+from logic import summarize_climate_data
 
 bp = Blueprint("api", __name__)
 
@@ -112,17 +112,26 @@ def get_summary():
 
     Returns weighted min, max, and avg values for each metric in the format specified in the API docs.
     """
-    # TODO: Implement this endpoint
-    # 1. Get query parameters from request.args
-    # 2. Validate quality_threshold if provided
-    # 3. Get list of metrics to summarize
-    # 4. For each metric:
-    #    - Calculate quality-weighted statistics using QUALITY_WEIGHTS
-    #    - Calculate quality distribution
-    #    - Apply proper filtering
-    # 5. Format response according to API specification
-
-    return jsonify({"data": {}})
+    location_id = request.args.get("location_id")
+    start_date = request.args.get("start_date", type=date.fromisoformat)
+    end_date = request.args.get("end_date", type=date.fromisoformat)
+    metric = request.args.get("metric")
+    quality_threshold = request.args.get("quality_threshold")
+    if quality_threshold and quality_threshold not in QUALITY_WEIGHTS:
+        return (
+            jsonify(
+                {
+                    "error": f"Invalid quality_threshold. Must be one of: {QUALITY_WEIGHTS.keys()}"
+                }
+            ),
+            400,
+        )
+    query = filter_climate_data(
+        location_id, start_date, end_date, metric, quality_threshold
+    )
+    climate_data = [data.to_dict() for data in query.all()]
+    summary = summarize_climate_data(climate_data)
+    return jsonify({"data": summary})
 
 
 @bp.route("/trends", methods=["GET"])
