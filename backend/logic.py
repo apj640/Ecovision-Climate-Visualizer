@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from typing import List
-from const import QUALITY_WEIGHTS
+from const import METRICS, QUALITY_WEIGHTS
 
 
 def summarize_climate_data(climate_data: List[dict]):
@@ -14,7 +14,17 @@ def summarize_climate_data(climate_data: List[dict]):
       dict: keyed by metric name with min/max/avg/weighted_avg/unit and quality distribution.
     """
     if not climate_data:
-        return {}
+        return {
+            metric: {
+                "min": 0.0,
+                "max": 0.0,
+                "avg": 0.0,
+                "weighted_avg": 0.0,
+                "unit": "celsius",
+                "quality_distribution": {q: 0.0 for q in QUALITY_WEIGHTS.keys()},
+            }
+            for metric in METRICS
+        }
 
     df = pd.DataFrame(climate_data)
     result = {}
