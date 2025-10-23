@@ -1,9 +1,8 @@
 from flask import jsonify, request, Blueprint
 from datetime import date
 from models import Location, Metric, ClimateData
+from const import QUALITY_WEIGHTS
 
-# Quality weights to be used in calculations
-QUALITY_WEIGHTS = {"excellent": 1.0, "good": 0.8, "questionable": 0.5, "poor": 0.3}
 
 bp = Blueprint("api", __name__)
 
