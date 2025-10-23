@@ -1,4 +1,5 @@
 from flask import jsonify, request, Blueprint
+from models import Location, Metric
 
 # Quality weights to be used in calculations
 QUALITY_WEIGHTS = {"excellent": 1.0, "good": 0.8, "questionable": 0.5, "poor": 0.3}
@@ -31,11 +32,9 @@ def get_locations():
 
     Returns location data in the format specified in the API docs.
     """
-    # TODO: Implement this endpoint
-    # 1. Query the locations table
-    # 2. Format response according to API specification
-
-    return jsonify({"data": []})
+    locations = Location.query.all()
+    data = [loc.to_dict() for loc in locations]
+    return jsonify({"data": data})
 
 
 @bp.route("/metrics", methods=["GET"])
@@ -45,11 +44,9 @@ def get_metrics():
 
     Returns metric data in the format specified in the API docs.
     """
-    # TODO: Implement this endpoint
-    # 1. Query the metrics table
-    # 2. Format response according to API specification
-
-    return jsonify({"data": []})
+    metrics = Metric.query.all()
+    data = [m.to_dict() for m in metrics]
+    return jsonify({"data": data})
 
 
 @bp.route("/summary", methods=["GET"])
