@@ -7,6 +7,7 @@ from flask_cors import CORS
 import os
 from database import db
 import models
+from routes import bp
 
 
 def build_conn_str():
@@ -20,7 +21,7 @@ def build_conn_str():
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
-
+app.register_blueprint(bp, url_prefix="/api/v1")
 app.config["SQLALCHEMY_DATABASE_URI"] = build_conn_str()
 
 with app.app_context():

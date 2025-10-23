@@ -1,11 +1,12 @@
-from app import app
-from flask import jsonify, request
+from flask import jsonify, request, Blueprint
 
 # Quality weights to be used in calculations
 QUALITY_WEIGHTS = {"excellent": 1.0, "good": 0.8, "questionable": 0.5, "poor": 0.3}
 
+bp = Blueprint("api", __name__)
 
-@app.route("/api/v1/climate", methods=["GET"])
+
+@bp.route("/climate", methods=["GET"])
 def get_climate_data():
     """
     Retrieve climate data with optional filtering.
@@ -23,7 +24,7 @@ def get_climate_data():
     return jsonify({"data": [], "meta": {"total_count": 0, "page": 1, "per_page": 50}})
 
 
-@app.route("/api/v1/locations", methods=["GET"])
+@bp.route("/locations", methods=["GET"])
 def get_locations():
     """
     Retrieve all available locations.
@@ -37,7 +38,7 @@ def get_locations():
     return jsonify({"data": []})
 
 
-@app.route("/api/v1/metrics", methods=["GET"])
+@bp.route("/metrics", methods=["GET"])
 def get_metrics():
     """
     Retrieve all available climate metrics.
@@ -51,7 +52,7 @@ def get_metrics():
     return jsonify({"data": []})
 
 
-@app.route("/api/v1/summary", methods=["GET"])
+@bp.route("/summary", methods=["GET"])
 def get_summary():
     """
     Retrieve quality-weighted summary statistics for climate data.
@@ -72,7 +73,7 @@ def get_summary():
     return jsonify({"data": {}})
 
 
-@app.route("/api/v1/trends", methods=["GET"])
+@bp.route("/trends", methods=["GET"])
 def get_trends():
     """
     Analyze trends and patterns in climate data.
