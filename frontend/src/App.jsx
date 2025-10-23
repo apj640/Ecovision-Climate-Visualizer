@@ -3,6 +3,7 @@ import Filters from './components/Filters';
 import ChartContainer from './components/ChartContainer';
 import TrendAnalysis from './components/TrendAnalysis';
 import QualityIndicator from './components/QualityIndicator';
+import { getLocations, getMetrics, getClimateData, getClimateSummary, getClimateTrends } from './api';
 
 function App() {
   const [locations, setLocations] = useState([]);
@@ -20,31 +21,41 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   // Existing useEffect for locations and metrics
+  useEffect(() => {
+    const fetchLocations = async () => {
+      const res = await getLocations();
+      const data = await res.json();
+      setLocations(data.data);
+    };
+
+    const fetchMetrics = async () => {
+      const res = await getMetrics();
+      const data = await res.json();
+      setMetrics(data.data);
+    };
+    fetchLocations();
+    fetchMetrics();
+    fetchData();
+  }, []);
 
   // Updated fetch function to handle different analysis types
   const fetchData = async () => {
     setLoading(true);
     try {
-      const queryParams = new URLSearchParams({
-        ...(filters.locationId && { location_id: filters.locationId }),
-        ...(filters.startDate && { start_date: filters.startDate }),
-        ...(filters.endDate && { end_date: filters.endDate }),
-        ...(filters.metric && { metric: filters.metric }),
-        ...(filters.qualityThreshold && { quality_threshold: filters.qualityThreshold })
-      });
-
-      let endpoint = '/api/v1/climate';
+      let res;
       if (filters.analysisType === 'trends') {
-        endpoint = '/api/v1/trends';
+        res = await getClimateTrends(filters);
       } else if (filters.analysisType === 'weighted') {
-        endpoint = '/api/v1/summary';
+        res = await getClimateSummary(filters);
+      } else {
+        res = await getClimateData(filters);
       }
+      const data = await res.json();
 
-      const response = await fetch(`${endpoint}?${queryParams}`);
-      const data = await response.json();
-      
       if (filters.analysisType === 'trends') {
-        setTrendData(data.data);
+        if (data.data) {
+          setTrendData(data.data);
+        }
       } else {
         setClimateData(data.data);
       }
@@ -66,7 +77,7 @@ function App() {
         </p>
       </header>
 
-      <Filters 
+      <Filters
         locations={locations}
         metrics={metrics}
         filters={filters}
@@ -76,20 +87,20 @@ function App() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         {filters.analysisType === 'trends' ? (
-          <TrendAnalysis 
+          <TrendAnalysis
             data={trendData}
             loading={loading}
           />
         ) : (
           <>
-            <ChartContainer 
+            <ChartContainer
               title="Climate Trends"
               loading={loading}
               chartType="line"
               data={climateData}
               showQuality={true}
             />
-            <ChartContainer 
+            <ChartContainer
               title="Quality Distribution"
               loading={loading}
               chartType="bar"
@@ -100,7 +111,7 @@ function App() {
         )}
       </div>
 
-      <QualityIndicator 
+      <QualityIndicator
         data={climateData}
         className="mt-6"
       />
