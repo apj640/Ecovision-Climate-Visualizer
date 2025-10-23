@@ -11,7 +11,7 @@ from routes import bp
 
 
 def build_conn_str():
-    """Build the MySQL connection string from environment variables."""
+    """Build the Postgres connection string from environment variables."""
     host = os.environ.get("PG_HOST", "127.0.0.1")
     user = os.environ.get("PG_USER", "postgres")
     password = os.environ.get("PG_PASSWORD", "postgres")
