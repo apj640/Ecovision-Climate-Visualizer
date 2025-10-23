@@ -2,7 +2,7 @@
  * API service module for making requests to the backend
  */
 
-const API_BASE_URL = `${import.meta.API_URL}/api/v1`;
+const API_BASE_URL = "http://localhost:5000/api/v1";
 
 /**
  * Fetch climate data with optional filters
